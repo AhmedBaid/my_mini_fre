@@ -1,3 +1,5 @@
+import { todoApp } from "./config.js";
+
 const miniframework = () => {
     // hna usestate
     let states = [];
@@ -46,6 +48,8 @@ const miniframework = () => {
 
     // hna build the dom
     function buildDOM(node) {
+        console.log(node);
+        
         if (typeof node === "string" || typeof node === "number") {
             return document.createTextNode(String(node));
         }
@@ -87,10 +91,10 @@ const miniframework = () => {
     // }
     function render() {
         const appContainer = document.getElementById("app");
-        appContainer.innerHTML = "<h1>Todo App</h1>";
-        const domTree = buildDOM(Todo);
+        appContainer.innerHTML = "";
+        const domTree = buildDOM(todoApp);
         appContainer.appendChild(domTree);
     }
-    return { useState, useEffect, Router, Store, render };
+    return { useState, useEffect, Router, render };
 };
-export const { useState, useEffect, Router, Store, render } = miniframework();
+export const { useState, useEffect, Router, render } = miniframework();
