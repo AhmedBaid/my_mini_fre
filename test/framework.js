@@ -46,18 +46,30 @@ const miniframework = () => {
 
 
 
-    // hna build the dom
     function buildDOM(node) {
-        console.log(node);
-        
         if (typeof node === "string" || typeof node === "number") {
             return document.createTextNode(String(node));
         }
 
         const el = document.createElement(node.tag);
+
         if (node.attrs) {
             for (const [attr, value] of Object.entries(node.attrs)) {
-                el.setAttribute(attr, value);
+                if (attr.startsWith("on") && typeof value === "function") {
+                    el.addEventListener(attr.slice(2).toLowerCase(), value);
+                }
+                else if (attr === "class") {
+                    el.className = value;
+                }
+                else if (attr === "for") {
+                    el.htmlFor = value;
+                }
+                else if (attr in el) {
+                    el[attr] = value;
+                }
+                else {
+                    el.setAttribute(attr, value);
+                }
             }
         }
 
@@ -69,6 +81,7 @@ const miniframework = () => {
 
         return el;
     }
+
 
     function Router() {
     }
