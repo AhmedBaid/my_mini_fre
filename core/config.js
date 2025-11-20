@@ -1,5 +1,5 @@
 export const todoApp = {
-    tag: "div",
+    tag: "section",
     attrs: { class: "todoapp", id: "app" },
     children: [
         {
