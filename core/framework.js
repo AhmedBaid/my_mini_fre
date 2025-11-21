@@ -1,4 +1,4 @@
-import { todoApp } from "./config.js";
+import { footer, todoApp } from "./config.js";
 
 const miniframework = () => {
     // hna usestate
@@ -85,28 +85,31 @@ const miniframework = () => {
 
     function Router() {
     }
-    // function Store(initialState) {
-    //     let state = initialState || null;
-    //     const listeners = [];
+    function Store(initialState) {
+        let state = initialState || null;
+        const listeners = [];
 
-    //     const get = () => state;
+        const get = () => state;
 
-    //     const set = (newState) => {
-    //         state = { ...state, ...newState };
-    //         listeners.forEach(fn => fn(state));
-    //     };
+        const set = (newState) => {
+            state = { ...state, ...newState };
+            listeners.forEach(fn => fn(state));
+            render();
+        };
 
-    //     const subscribe = (fn) => {
-    //         listeners.push(fn);
-    //     };
+        const subscribe = (fn) => {
+            listeners.push(fn);
+        };
 
-    //     return { get, set, subscribe };
-    // }
+        return { get, set, subscribe };
+    }
     function render() {
         const appContainer = document.getElementById("app");
         appContainer.innerHTML = "";
-        const domTree = buildDOM(todoApp);
-        appContainer.appendChild(domTree);
+        const section = buildDOM(todoApp);
+        const footersection = buildDOM(footer);
+        appContainer.appendChild(section);
+        appContainer.appendChild(footersection);
     }
     return { useState, useEffect, Router, render };
 };
