@@ -1,11 +1,19 @@
-import { useState } from "./framework.js";
+import { useState } from "../../core/framework.js";
 
-export function TodoApp({ todos }) {
+export function TodoApp(state, store) {
     const [newTodo, setNewTodo] = useState("");
+    const todos = (state && state.todos) ? state.todos : [];
+    const filter = (state && state.filter) ? state.filter : 'all';
+
+    const displayed = todos.filter(t => {
+        if (filter === 'active') return !t.completed;
+        if (filter === 'completed') return t.completed;
+        return true;
+    });
+
     return {
         tag: "section",
         attrs: { class: "todoapp" },
-
         children: [
             {
                 tag: "header",
@@ -23,8 +31,18 @@ export function TodoApp({ todos }) {
                                     id: "todo-input",
                                     type: "text",
                                     placeholder: "What needs to be done?",
+                                    value: newTodo,
                                     onchange: (e) => setNewTodo(e.target.value),
-                                    value: newTodo
+                                    onkeydown: (e) => {
+                                        if (e.key === "Enter" && newTodo.trim()) {
+                                            // add a new todo object
+                                            store.update(prev => {
+                                                const prevTodos = (prev && prev.todos) || [];
+                                                return { ...prev, todos: [...prevTodos, { text: newTodo.trim(), completed: false }] };
+                                            });
+                                            setNewTodo("");
+                                        }
+                                    }
                                 }
                             },
                             {
@@ -39,7 +57,6 @@ export function TodoApp({ todos }) {
                     }
                 ]
             },
-
             {
                 tag: "main",
                 attrs: { class: "main" },
@@ -47,14 +64,31 @@ export function TodoApp({ todos }) {
                     {
                         tag: "ul",
                         attrs: { class: "todo-list" },
-                        children: todos.map(t => ({
-                            tag: "li",
-                            attrs: { class: "todo-item" },
-                            children: [
-                                { tag: "input", attrs: { type: "checkbox", class: "toggle" } },
-                                { tag: "label", children: [t] }
-                            ]
-                        }))
+                        children: displayed.map((todo, index) => {
+                            // compute real index in todos array
+                            const realIndex = todos.indexOf(todo);
+                            return {
+                                tag: "li",
+                                attrs: { class: todo.completed ? 'todo-item completed' : 'todo-item', id: realIndex },
+                                children: [
+                                    { tag: "input", attrs: { type: "checkbox", class: "toggle", onclick: () => {
+                                        store.update(prev => {
+                                            const prevTodos = (prev && prev.todos) || [];
+                                            const next = prevTodos.map((t, i) => i === realIndex ? { ...t, completed: !t.completed } : t);
+                                            return { ...prev, todos: next };
+                                        });
+                                    } } },
+                                    { tag: "label", children: [todo.text] },
+                                    { tag: "button", attrs: { class: "destroy", onclick: () => {
+                                        store.update(prev => {
+                                            const prevTodos = (prev && prev.todos) || [];
+                                            const next = prevTodos.filter((_, i) => i !== realIndex);
+                                            return { ...prev, todos: next };
+                                        });
+                                    } }, children: [] }
+                                ]
+                            };
+                        })
                     }
                 ]
             }
@@ -87,3 +121,4 @@ export const footer = {
         }
     ]
 }
+// helper removed; operations now use `store.update` directly

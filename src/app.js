@@ -1,7 +1,9 @@
+import { render, store } from "../core/framework.js";
+
 const routes = {
-    '/': () => storeInstance.setState({ filter: 'all' }),
-    '/active': () => storeInstance.setState({ filter: 'active' }),
-    '/completed': () => storeInstance.setState({ filter: 'completed' })
+    '/': () => { store.set({ filter: 'all' }); render(); },
+    '/active': () => { store.set({ filter: 'active' }); render(); },
+    '/completed': () => { store.set({ filter: 'completed' }); render(); }
 };
 function handleRouteChange() {
     const route = window.location.hash.slice(1) || '/';
@@ -13,7 +15,6 @@ function handleRouteChange() {
 }
 function startTransition() {
     console.log("Transition started");
-
     window.addEventListener('hashchange', handleRouteChange);
     handleRouteChange();
 

@@ -1,4 +1,4 @@
-import { footer, todoApp } from "./config.js";
+import { footer, TodoApp } from "../src/components/config.js";
 
 const miniframework = () => {
     // hna usestate
@@ -86,31 +86,56 @@ const miniframework = () => {
     function Router() {
     }
     function Store(initialState) {
-        let state = initialState || null;
+        let state = initialState === undefined ? null : initialState;
         const listeners = [];
 
         const get = () => state;
 
         const set = (newState) => {
-            state = { ...state, ...newState };
+            // merge when both are objects, otherwise replace
+            if (state && typeof state === 'object' && newState && typeof newState === 'object' && !Array.isArray(state)) {
+                state = { ...state, ...newState };
+            } else {
+                state = newState;
+            }
+
             listeners.forEach(fn => fn(state));
-            render();
+            // re-render the app when store changes
+            try {
+                render();
+            } catch (e) {
+                // render might not be defined yet during initialization; ignore in that case
+            }
         };
 
         const subscribe = (fn) => {
             listeners.push(fn);
+            // return an unsubscribe function
+            return () => {
+                const idx = listeners.indexOf(fn);
+                if (idx !== -1) listeners.splice(idx, 1);
+            };
         };
 
-        return { get, set, subscribe };
+        const update = (updater) => {
+            const next = typeof updater === 'function' ? updater(state) : updater;
+            set(next);
+        };
+
+        return { get, set, subscribe, update };
     }
+
+    // instantiate the store for the todo app state (initially an object)
+    // store shape: { todos: [], filter: 'all' }
+    const store = Store({ todos: [], filter: 'all' });
     function render() {
         const appContainer = document.getElementById("app");
         appContainer.innerHTML = "";
-        const section = buildDOM(todoApp);
+        const section = buildDOM(TodoApp(store.get(), store));
         const footersection = buildDOM(footer);
         appContainer.appendChild(section);
         appContainer.appendChild(footersection);
     }
-    return { useState, useEffect, Router, render };
+    return { useState, useEffect, Router, render, store };
 };
-export const { useState, useEffect, Router, render } = miniframework();
+export const { useState, useEffect, Router, render, store } = miniframework();
