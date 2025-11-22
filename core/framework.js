@@ -105,11 +105,13 @@ const miniframework = () => {
         return { get, set };
     }
 
-    const store = Store({ todos: [{ text: "dzd", completed: false }] });
+    const store = Store({ todos: [] });
 
     function render() {
         
         const appContainer = document.getElementById("app");
+        console.log("appContainer", appContainer);
+
         appContainer.innerHTML = "";
         const section = buildDOM(TodoApp(store.get(), store));
         const footersection = buildDOM(footer);

@@ -3,6 +3,22 @@ import { useState } from "../../core/framework.js";
 export function TodoApp(state, store) {
     const todos = state.todos.map(t => t.text);
     const [newTodo, setNewTodo] = useState("");
+    const itemleft = state.todos.filter(t => !t.completed).length;
+    function deleteTodo(index) {
+        const updatedTodos = todos.filter((_, i) => {
+            return i !== index;
+        });
+        store.set({ todos: updatedTodos });
+    }
+    function ToggleTodoCompleted(todo) {
+        const updatedTodos = state.todos.map(t => {
+            if (t.text === todo) {
+                return { ...t, completed: !t.completed };
+            }
+            return t;
+        });
+        store.set({ todos: updatedTodos });
+    }
     return {
         tag: "section",
         attrs: { class: "todoapp" },
@@ -24,6 +40,8 @@ export function TodoApp(state, store) {
                                     type: "text",
                                     autofocus: true,
                                     placeholder: "What needs to be done?",
+                                    value: newTodo,
+                                    onchange: (e) => setNewTodo(e.target.value),
                                     onkeydown: (e) => {
                                         const neww = e.target.value.trim();
                                         if (e.key === "Enter" && neww.length >= 2) {
@@ -34,6 +52,8 @@ export function TodoApp(state, store) {
                                                 ]
                                             });
                                             setNewTodo("");
+                                        } else {
+                                            return;
                                         }
                                     }
                                 }
@@ -58,12 +78,21 @@ export function TodoApp(state, store) {
                     {
                         tag: "ul",
                         attrs: { class: "todo-list" },
-                        children: todos.map(t => ({
+                        children: todos.map((t, index) => ({
                             tag: "li",
                             attrs: { class: "todo-item" },
                             children: [
-                                { tag: "input", attrs: { type: "checkbox", class: "toggle" } },
-                                { tag: "label", children: [t] }
+                                { tag: "input", attrs: { type: "checkbox", class: "toggle", onclick: () => ToggleTodoCompleted(t) } },
+                                { tag: "label", children: [t] },
+                                {
+                                    tag: "button",
+                                    attrs: {
+                                        class: "destroy",
+                                        onclick: () => {
+                                            deleteTodo(index)
+                                        }
+                                    }
+                                }
                             ]
                         }))
                     }
@@ -76,7 +105,7 @@ export function TodoApp(state, store) {
                     {
                         tag: "span",
                         attrs: { class: "todo-count" },
-                        children: ["1 item left!"]
+                        children: [itemleft + " items left"]
                     },
                     {
                         tag: "ul",
