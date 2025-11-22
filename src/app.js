@@ -1,10 +1,11 @@
 import { render, store } from "../core/framework.js";
+import { rendering } from "./components/notfound.js";
 
 const routes = {
     '/': () => { store.set({ filter: 'all' }); render(); },
     '/active': () => { store.set({ filter: 'active' }); render(); },
     '/completed': () => { store.set({ filter: 'completed' }); render(); },
-    '/notfound': () => { notfound() }
+    '/notfound': () => { rendering() }
 };
 function handleRouteChange() {
     const route = window.location.hash.slice(1) || '/';

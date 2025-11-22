@@ -1,8 +1,6 @@
-import { useState } from "../../core/framework.js";
 
 export function TodoApp(state, store) {
     const todos = state.todos.map(t => t.text);
-    const [newTodo, setNewTodo] = useState("");
     const itemleft = state.todos.filter(t => !t.completed).length;
     function deleteTodo(index) {
         const updatedTodos = todos.filter((_, i) => {
@@ -40,8 +38,6 @@ export function TodoApp(state, store) {
                                     type: "text",
                                     autofocus: true,
                                     placeholder: "What needs to be done?",
-                                    value: newTodo,
-                                    onchange: (e) => setNewTodo(e.target.value),
                                     onkeydown: (e) => {
                                         const neww = e.target.value.trim();
                                         if (e.key === "Enter" && neww.length >= 2) {
@@ -51,7 +47,6 @@ export function TodoApp(state, store) {
                                                     { text: neww, completed: false }
                                                 ]
                                             });
-                                            setNewTodo("");
                                         } else {
                                             return;
                                         }

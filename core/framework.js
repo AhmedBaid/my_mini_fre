@@ -92,7 +92,7 @@ const miniframework = () => {
         const get = () => state;
 
         const set = (newState) => {
-            
+
             state = { ...state, ...newState };
             render();
         };
@@ -108,16 +108,13 @@ const miniframework = () => {
     const store = Store({ todos: [] });
 
     function render() {
-        
         const appContainer = document.getElementById("app");
-        console.log("appContainer", appContainer);
-
         appContainer.innerHTML = "";
         const section = buildDOM(TodoApp(store.get(), store));
         const footersection = buildDOM(footer);
         appContainer.appendChild(section);
         appContainer.appendChild(footersection);
     }
-    return { useState, useEffect, Router, render, store };
+    return { useState, useEffect, Router, render, store, buildDOM };
 };
-export const { useState, useEffect, Router, render, store } = miniframework();
+export const { useState, useEffect, Router, render, store, buildDOM } = miniframework();
