@@ -86,49 +86,29 @@ const miniframework = () => {
     function Router() {
     }
     function Store(initialState) {
+
         let state = initialState === undefined ? null : initialState;
-        const listeners = [];
 
         const get = () => state;
 
         const set = (newState) => {
-            // merge when both are objects, otherwise replace
-            if (state && typeof state === 'object' && newState && typeof newState === 'object' && !Array.isArray(state)) {
-                state = { ...state, ...newState };
-            } else {
-                state = newState;
-            }
-
-            listeners.forEach(fn => fn(state));
-            // re-render the app when store changes
-            try {
-                render();
-            } catch (e) {
-                // render might not be defined yet during initialization; ignore in that case
-            }
+            
+            state = { ...state, ...newState };
+            render();
         };
 
-        const subscribe = (fn) => {
-            listeners.push(fn);
-            // return an unsubscribe function
-            return () => {
-                const idx = listeners.indexOf(fn);
-                if (idx !== -1) listeners.splice(idx, 1);
-            };
-        };
+        // const update = (updater) => {
+        //     const next = typeof updater === 'function' ? updater(state) : updater;
+        //     set(next);
+        // };
 
-        const update = (updater) => {
-            const next = typeof updater === 'function' ? updater(state) : updater;
-            set(next);
-        };
-
-        return { get, set, subscribe, update };
+        return { get, set };
     }
 
-    // instantiate the store for the todo app state (initially an object)
-    // store shape: { todos: [], filter: 'all' }
-    const store = Store({ todos: [], filter: 'all' });
+    const store = Store({ todos: [{ text: "dzd", completed: false }] });
+
     function render() {
+        
         const appContainer = document.getElementById("app");
         appContainer.innerHTML = "";
         const section = buildDOM(TodoApp(store.get(), store));
